@@ -1,7 +1,7 @@
-import getDefaultMessages from './getDefaultMessages';
-import getLanguageReport from './getLanguageReport';
+import { getDefaultMessages } from "./getDefaultMessages";
+import { getLanguageReport } from "./getLanguageReport";
 
-export default (languages, hooks) => {
+function core(languages, hooks) {
   const {
     provideExtractedMessages,
     outputSingleFile,
@@ -11,24 +11,24 @@ export default (languages, hooks) => {
     provideTranslationsFile,
     provideWhitelistFile,
     reportLanguage,
-    afterReporting
+    afterReporting,
   } = hooks;
 
   const extractedMessages = provideExtractedMessages();
 
-  if (typeof outputSingleFile === 'function') {
+  if (typeof outputSingleFile === "function") {
     outputSingleFile(extractedMessages);
   }
 
   const defaultMessages = getDefaultMessages(extractedMessages);
 
-  if (typeof outputDuplicateKeys === 'function') {
+  if (typeof outputDuplicateKeys === "function") {
     outputDuplicateKeys(defaultMessages.duplicateIds);
   }
 
-  if (typeof beforeReporting === 'function') beforeReporting();
+  if (typeof beforeReporting === "function") beforeReporting();
 
-  languages.forEach(lang => {
+  for (const lang of languages) {
     const langResults = provideLangTemplate(lang);
 
     const file = provideTranslationsFile(langResults);
@@ -37,14 +37,12 @@ export default (languages, hooks) => {
     if (!file) langResults.noTranslationFile = true;
     if (!whitelistFile) langResults.noWhitelistFile = true;
 
-    langResults.report = getLanguageReport(
-      defaultMessages.messages,
-      file,
-      whitelistFile
-    );
+    langResults.report = getLanguageReport(defaultMessages.messages, file, whitelistFile);
 
-    if (typeof reportLanguage === 'function') reportLanguage(langResults);
-  });
+    if (typeof reportLanguage === "function") reportLanguage(langResults);
+  }
 
-  if (typeof afterReporting === 'function') afterReporting();
-};
+  if (typeof afterReporting === "function") afterReporting();
+}
+
+export { core };

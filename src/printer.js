@@ -1,14 +1,14 @@
-import { bold } from 'chalk';
+import chalk from "chalk";
 
-export const newLine = () => console.log(' ');
+const newLine = () => console.log(" ");
 
-export const header = title => {
-  console.log(bold.underline(title));
+const header = (title) => {
+  console.log(chalk.bold.underline(title));
   newLine();
 };
 
-export const subheader = title => console.log(title);
+const subheader = (title) => console.log(title);
 
-export const footer = () => {
-  newLine();
-};
+const footer = () => newLine();
+
+export { newLine, header, subheader, footer };

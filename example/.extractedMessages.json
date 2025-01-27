@@ -1,0 +1,10 @@
+{
+  "hello_name": {
+    "defaultMessage": "Your name",
+    "description": "Name input field placeholder"
+  },
+  "hello_world": {
+    "defaultMessage": "Hello {name}",
+    "description": "A greeting to the world"
+  }
+}

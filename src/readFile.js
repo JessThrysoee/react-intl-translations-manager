@@ -1,9 +1,11 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from "node:fs";
 
-export default filename => {
+function readFile(filename) {
   try {
-    return readFileSync(filename, 'utf8');
+    return readFileSync(filename, "utf8");
   } catch (err) {
     return undefined;
   }
-};
+}
+
+export { readFile };

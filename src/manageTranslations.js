@@ -1,23 +1,24 @@
-import { writeFileSync } from 'fs';
-import { sync as mkdirpSync } from 'mkdirp';
-import Path from 'path';
-import { yellow, red, green } from 'chalk';
+import { writeFileSync } from "node:fs";
+import Path from "node:path";
+import chalk from "chalk";
+import { sync as mkdirpSync } from "mkdirp";
 
-import readFile from './readFile';
-import { header, subheader, footer } from './printer';
-import readMessageFiles from './readMessageFiles';
-import createSingleMessagesFile from './createSingleMessagesFile';
-import printResults from './printResults';
-import stringify from './stringify';
+import { createSingleMessagesFile } from "./createSingleMessagesFile";
+import { printResults } from "./printResults";
+import { footer, header, subheader } from "./printer";
+import { readFile } from "./readFile";
+import { readFormatJsDefaultFormatMessageFiles } from "./readFormatJsDefaultFormatMessageFiles";
+import { readMessageFiles } from "./readMessageFiles";
+import { stringify } from "./stringify";
 
-import core from './core';
+import { core } from "./core";
 
 const defaultJSONOptions = {
   space: 2,
-  trailingNewline: false
+  trailingNewline: false,
 };
 
-export default ({
+function manageTranslations({
   messagesDirectory,
   translationsDirectory,
   whitelistsDirectory = translationsDirectory,
@@ -25,74 +26,80 @@ export default ({
   singleMessagesFile = false,
   detectDuplicateIds = true,
   sortKeys = true,
+  readFormatJsDefaultFormat = false,
   jsonOptions = {},
   overridePrinters = {},
-  overrideCoreMethods = {}
-}) => {
+  overrideCoreMethods = {},
+}) {
   if (!messagesDirectory || !translationsDirectory) {
-    throw new Error('messagesDirectory and translationsDirectory are required');
+    throw new Error("messagesDirectory and translationsDirectory are required");
   }
 
   const defaultPrinters = {
-    printDuplicateIds: duplicateIds => {
-      header('Duplicate ids:');
+    printDuplicateIds: (duplicateIds) => {
+      header("Duplicate ids:");
       if (duplicateIds.length) {
-        duplicateIds.forEach(id => {
-          console.log('  ', `Duplicate message id: ${red(id)}`);
-        });
+        for (const id of duplicateIds) {
+          console.log("  ", `Duplicate message id: ${chalk.red(id)}`);
+        }
       } else {
-        console.log(green('  No duplicate ids found, great!'));
+        console.log(chalk.green("  No duplicate ids found, great!"));
       }
       footer();
     },
 
-    printLanguageReport: langResults => {
-      header(`Maintaining ${yellow(langResults.languageFilename)}:`);
+    printLanguageReport: (langResults) => {
+      header(`Maintaining ${chalk.yellow(langResults.languageFilename)}:`);
       printResults({ ...langResults.report, sortKeys });
     },
 
-    printNoLanguageFile: langResults => {
+    printNoLanguageFile: (langResults) => {
       subheader(`
         No existing ${langResults.languageFilename} translation file found.
         A new one is created.
       `);
     },
 
-    printNoLanguageWhitelistFile: langResults => {
+    printNoLanguageWhitelistFile: (langResults) => {
       subheader(
-        ```
+        ""`
         No existing ${langResults} file found.
         A new one is created.
-      ```
+      ```,
       );
-    }
+    },
   };
 
   const printers = {
     ...defaultPrinters,
-    ...overridePrinters
+    ...overridePrinters,
   };
 
   const stringifyOpts = {
     ...defaultJSONOptions,
     ...jsonOptions,
-    sortKeys
+    sortKeys,
   };
 
   const defaultCoreMethods = {
-    provideExtractedMessages: () => readMessageFiles(messagesDirectory),
+    provideExtractedMessages: () => {
+      if (readFormatJsDefaultFormat) {
+        return readFormatJsDefaultFormatMessageFiles(messagesDirectory);
+      }
+      return readMessageFiles(messagesDirectory);
+    },
 
-    outputSingleFile: combinedFiles => {
+    outputSingleFile: (combinedFiles) => {
       if (singleMessagesFile) {
         createSingleMessagesFile({
           messages: combinedFiles,
           directory: translationsDirectory,
-          sortKeys
+          sortKeys,
         });
       }
     },
 
-    outputDuplicateKeys: duplicateIds => {
+    outputDuplicateKeys: (duplicateIds) => {
       if (!detectDuplicateIds) return;
 
       printers.printDuplicateIds(duplicateIds);
@@ -103,76 +110,57 @@ export default ({
       mkdirpSync(whitelistsDirectory);
     },
 
-    provideLangTemplate: lang => {
+    provideLangTemplate: (lang) => {
       const languageFilename = `${lang}.json`;
-      const languageFilepath = Path.join(
-        translationsDirectory,
-        languageFilename
-      );
+      const languageFilepath = Path.join(translationsDirectory, languageFilename);
       const whitelistFilename = `whitelist_${lang}.json`;
-      const whitelistFilepath = Path.join(
-        whitelistsDirectory,
-        whitelistFilename
-      );
+      const whitelistFilepath = Path.join(whitelistsDirectory, whitelistFilename);
 
       return {
         lang,
         languageFilename,
         languageFilepath,
         whitelistFilename,
-        whitelistFilepath
+        whitelistFilepath,
       };
     },
 
-    provideTranslationsFile: langResults => {
+    provideTranslationsFile: (langResults) => {
       const jsonFile = readFile(langResults.languageFilepath);
       return jsonFile ? JSON.parse(jsonFile) : undefined;
     },
 
-    provideWhitelistFile: langResults => {
+    provideWhitelistFile: (langResults) => {
       const jsonFile = readFile(langResults.whitelistFilepath);
       return jsonFile ? JSON.parse(jsonFile) : undefined;
     },
 
-    reportLanguage: langResults => {
-      if (
-        !langResults.report.noTranslationFile &&
-        !langResults.report.noWhitelistFile
-      ) {
+    reportLanguage: (langResults) => {
+      if (!langResults.report.noTranslationFile && !langResults.report.noWhitelistFile) {
         printers.printLanguageReport(langResults);
 
-        writeFileSync(
-          langResults.languageFilepath,
-          stringify(langResults.report.fileOutput, stringifyOpts)
-        );
-        writeFileSync(
-          langResults.whitelistFilepath,
-          stringify(langResults.report.whitelistOutput, stringifyOpts)
-        );
+        writeFileSync(langResults.languageFilepath, stringify(langResults.report.fileOutput, stringifyOpts));
+        writeFileSync(langResults.whitelistFilepath, stringify(langResults.report.whitelistOutput, stringifyOpts));
       } else {
         if (langResults.report.noTranslationFile) {
           printers.printNoLanguageFile(langResults);
-          writeFileSync(
-            langResults,
-            stringify(langResults.report.fileOutput, stringifyOpts)
-          );
+          writeFileSync(langResults, stringify(langResults.report.fileOutput, stringifyOpts));
         }
 
         if (langResults.report.noWhitelistFile) {
           printers.printNoLanguageWhitelistFile(langResults);
-          writeFileSync(
-            langResults.whitelistFilepath,
-            stringify([], stringifyOpts)
-          );
+          writeFileSync(langResults.whitelistFilepath, stringify([], stringifyOpts));
         }
       }
     },
 
-    afterReporting: () => {}
+    afterReporting: () => {},
   };
 
   core(languages, {
     ...defaultCoreMethods,
-    ...overrideCoreMethods
+    ...overrideCoreMethods,
   });
-};
+}
+
+export { manageTranslations };

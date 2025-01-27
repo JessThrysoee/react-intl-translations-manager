@@ -37,8 +37,8 @@
 //   ],
 // };
 
-export default files => {
-  if (!files) throw new Error('Files are required');
+function getDefaultMessages(files) {
+  if (!files) throw new Error("Files are required");
 
   return files.reduce(
     (fileAcc, { descriptors }) => {
@@ -48,15 +48,17 @@ export default files => {
           if (descAcc[id] !== undefined) {
             duplicateIds.push(id);
           }
-
-          return { ...descAcc, [id]: defaultMessage };
+          descAcc[id] = defaultMessage;
+          return descAcc;
         }, fileAcc.messages),
-        duplicateIds
+        duplicateIds,
       };
     },
     {
       messages: {},
-      duplicateIds: []
-    }
+      duplicateIds: [],
+    },
   );
-};
+}
+
+export { getDefaultMessages };

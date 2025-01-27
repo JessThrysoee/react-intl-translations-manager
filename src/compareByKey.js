@@ -1,4 +1,4 @@
-export default (a, b) => {
+function compareByKey(a, b) {
   const ka = a.key;
   const kb = b.key;
 
@@ -9,4 +9,6 @@ export default (a, b) => {
     return 1;
   }
   return 0;
-};
+}
+
+export { compareByKey };

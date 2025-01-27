@@ -1,0 +1,4 @@
+{
+  "hello_name": "Jouw naam",
+  "hello_world": "Hallo {name}"
+}

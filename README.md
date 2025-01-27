@@ -1,29 +1,5 @@
 # React-intl-translations-manager
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/GertjanReynaert/react-intl-translations-manager.svg)](https://greenkeeper.io/)
-[![travis-ci][travis-image]][travis-url]
-[![Codecov][codecov-image]][codecov-url]
-[![Commitizen friendly][comitizen-image]][comitizen-url]
-[![semantic-release][semantic-image]][semantic-url]
-[![npm-downloads][npm-downloads-image]][npm-downloads-url]
-[![npm-version][npm-version-image]][npm-version-url]
-[![npm-license][npm-license-image]][npm-license-url]
-
-[travis-image]: https://img.shields.io/travis/GertjanReynaert/react-intl-translations-manager.svg
-[travis-url]: https://travis-ci.org/GertjanReynaert/react-intl-translations-manager
-[codecov-image]: https://img.shields.io/codecov/c/github/GertjanReynaert/react-intl-translations-manager.svg
-[codecov-url]: https://codecov.io/github/GertjanReynaert/react-intl-translations-manager
-[comitizen-image]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
-[comitizen-url]: http://commitizen.github.io/cz-cli
-[semantic-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
-[semantic-url]: https://github.com/semantic-release/semantic-release
-[npm-downloads-image]: https://img.shields.io/npm/dt/react-intl-translations-manager.svg
-[npm-downloads-url]: https://www.npmjs.com/package/react-intl-translations-manager
-[npm-version-image]: https://img.shields.io/npm/v/react-intl-translations-manager.svg
-[npm-version-url]: https://www.npmjs.com/package/react-intl-translations-manager
-[npm-license-image]: https://img.shields.io/npm/l/react-intl-translations-manager.svg
-[npm-license-url]: https://www.npmjs.com/package/react-intl-translations-manager
-
 React-intl-translations-manager will help you in managing your translations.
 Hereby it will give you the current status of your translation, telling you what
 duplicate keys you have, what messages aren't translated yet, what messages were
