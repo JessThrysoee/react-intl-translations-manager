@@ -1,7 +1,7 @@
 {
   "name": "@jessthrysoee/react-intl-translations-manager",
   "description": "Manage all translations based on the extracted messages from `formatjs extract`",
-  "version": "1.0.0",
+  "version": "6.0.0",
   "license": "MIT",
   "type": "module",
   "exports": {
